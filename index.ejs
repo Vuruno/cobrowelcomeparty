@@ -1,0 +1,26 @@
+
+<video id="video" height="35%" autoplay></video>
+<button class="btn btn-primary" id="snap">Scan</button>
+<canvas id="canvas" height="0%"></canvas>
+
+<script>
+    if ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) {
+  alert('yes')
+} else {
+    alert('no')
+}
+navigator.mediaDevices.getUserMedia({video: true})
+
+
+let canvas = document.querySelector('#canvas')
+let context = canvas.getContext('2d')
+let video = document.querySelector('#video')
+
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({video:true}).then(stream => {
+        video.srcObject = stream;
+        video.play()
+    })
+}
+
+</script>
