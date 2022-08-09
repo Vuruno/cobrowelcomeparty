@@ -1,26 +1,67 @@
-
-<video id="video" height="35%" autoplay></video>
+<video id="video" height="35%" width="100%" autoplay></video>
 <button class="btn btn-primary" id="snap">Scan</button>
-<canvas id="canvas" height="0%"></canvas>
+<canvas id="canvas" height="640" width="400"></canvas>
 
-<script>
-    if ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) {
-  alert('yes')
-} else {
-    alert('no')
-}
-navigator.mediaDevices.getUserMedia({video: true})
+<script type="text/javascript" src="./qr-scanner.min.js"></script>
 
+<script type="module">
+    import QrScanner from './qr-scanner.min.js';
 
-let canvas = document.querySelector('#canvas')
-let context = canvas.getContext('2d')
-let video = document.querySelector('#video')
+    let videoElem = document.querySelector('#video')
+    const qrScanner = new QrScanner(videoElem, result => 
+    console.log('decoded qr code:', result));
 
-if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({video:true}).then(stream => {
-        video.srcObject = stream;
-        video.play()
+    document.getElementById('snap').addEventListener('click', () => {
+        qrScanner.start();
     })
-}
+</script>
+
+<script type="text/javascript">
+    navigator.mediaDevices.getUserMedia({ video: true })
+
+
+    let canvas = document.querySelector('#canvas')
+    let context = canvas.getContext('2d')
+    let video = document.querySelector('#video')
+
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: {
+                facingMode: 'environment'
+            }
+        }).then(stream => {
+            video.srcObject = stream;
+            video.play()
+        })
+    }
+
+    // document.getElementById('snap').addEventListener('click', () => {
+    // //     qrScanner.start();
+    //     context.drawImage(video, 0, 0, 400, 640)
+
+    //     // var dataURL = context.getImageData(0, 0, 400, 640)
+
+    //     var dataURL = canvas.toDataURL("image/png").replace(/^data:image\/png;base64,/, "")
+
+    //     var formData = new FormData()
+
+    //     // formData.append('username', 'abc123');
+    //     formData.append('image', dataURL);
+
+    //     // FETCH
+    //     // var qr = new QrCode();
+    //     // console.log(';;'+qr.decode(dataURL))
+
+    //     // let newData = JSON.stringify({'image': dataURL})
+
+    //     const url = '/uploadqr';
+    //     const options = {
+    //         method: 'POST',
+    //         body: formData
+    //     }
+
+    //     fetch(url, options)
+    // })
 
 </script>

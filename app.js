@@ -4,6 +4,18 @@ const router = express.Router();
 const app = express()
 const path = require('path')
 const expressLayouts = require('express-ejs-layouts');
+const bodyparser = require('body-parser');
+
+// app.use(bodyparser.json({ limit: '50mb' }));
+// app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }));
+
+// middlewares
+app.use(bodyparser.urlencoded({
+  extended: true
+}));
+app.use(express.urlencoded({extended: true})); 
+// app.use(express.json());
+app.use(express.static(path.resolve('./public')));
 
 const hostname = '127.0.0.1';
 const port = 2380;
