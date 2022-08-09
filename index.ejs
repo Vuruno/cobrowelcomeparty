@@ -1,67 +1,117 @@
-<video id="video" height="35%" width="100%" autoplay></video>
-<button class="btn btn-primary" id="snap">Scan</button>
-<canvas id="canvas" height="640" width="400"></canvas>
-
-<script type="text/javascript" src="./qr-scanner.min.js"></script>
-
-<script type="module">
-    import QrScanner from './qr-scanner.min.js';
-
-    let videoElem = document.querySelector('#video')
-    const qrScanner = new QrScanner(videoElem, result => 
-    console.log('decoded qr code:', result));
-
-    document.getElementById('snap').addEventListener('click', () => {
-        qrScanner.start();
-    })
-</script>
-
-<script type="text/javascript">
-    navigator.mediaDevices.getUserMedia({ video: true })
-
-
-    let canvas = document.querySelector('#canvas')
-    let context = canvas.getContext('2d')
-    let video = document.querySelector('#video')
-
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({
-            audio: false,
-            video: {
-                facingMode: 'environment'
-            }
-        }).then(stream => {
-            video.srcObject = stream;
-            video.play()
-        })
+<style>
+    html {
+        height: 100%;
     }
 
-    // document.getElementById('snap').addEventListener('click', () => {
-    // //     qrScanner.start();
-    //     context.drawImage(video, 0, 0, 400, 640)
+    body {
+        font-family: sans-serif;
+        padding: 0 10px;
+        height: 100%;
+        /* background: black; */
+        margin: 0;
+    }
 
-    //     // var dataURL = context.getImageData(0, 0, 400, 640)
+    h1 {
+        color: white;
+        margin: 0;
+        padding: 15px;
+    }
 
-    //     var dataURL = canvas.toDataURL("image/png").replace(/^data:image\/png;base64,/, "")
+    #container {
+        text-align: center;
+        margin: 0;
+    }
 
-    //     var formData = new FormData()
+    #qr-canvas {
+        margin: auto;
+        width: calc(100% - 20px);
+        max-width: 400px;
+    }
 
-    //     // formData.append('username', 'abc123');
-    //     formData.append('image', dataURL);
+    #btn-scan-qr {
+        cursor: pointer;
+    }
 
-    //     // FETCH
-    //     // var qr = new QrCode();
-    //     // console.log(';;'+qr.decode(dataURL))
+    #btn-scan-qr img {
+        height: 10em;
+        padding: 15px;
+        margin: 15px;
+        background: white;
+    }
 
-    //     // let newData = JSON.stringify({'image': dataURL})
+    #qr-result {
+        font-size: 1.2em;
+        margin: 20px auto;
+        padding: 20px;
+        max-width: 700px;
+        background-color: white;
+    }
+</style>
 
-    //     const url = '/uploadqr';
-    //     const options = {
-    //         method: 'POST',
-    //         body: formData
-    //     }
+<div id="container">
+    <h1>QR Code Scanner</h1>
 
-    //     fetch(url, options)
-    // })
+    <a id="btn-scan-qr"> start </a>
 
+    <canvas id="qr-canvas"></canvas>
+
+    <div>
+        <b>Data:</b> <span id="outputData"></span>
+    </div>
+</div>
+
+<script src="https://rawgit.com/sitepoint-editors/jsqrcode/master/src/qr_packed.js">
+</script>
+<script>
+    const video = document.createElement("video");
+    const canvasElement = document.getElementById("qr-canvas");
+    const canvas = canvasElement.getContext("2d");
+
+    // const qrResult = document.getElementById("qr-result");
+    const outputData = document.getElementById("outputData");
+    const btnScanQR = document.getElementById("btn-scan-qr");
+
+    let scanning = false;
+
+    qrcode.callback = (res) => {
+        if (res) {
+            outputData.innerText = res;
+            scanning = false;
+
+            video.srcObject.getTracks().forEach(track => {
+                track.stop();
+            });
+        }
+    };
+
+    btnScanQR.onclick = () => {
+        navigator.mediaDevices
+            .getUserMedia({ video: { facingMode: "environment" } })
+            .then(function (stream) {
+                scanning = true;
+                // btnScanQR.hidden = true;
+                // canvasElement.hidden = false;
+                video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
+                video.srcObject = stream;
+                video.play();
+                tick();
+                scan();
+            });
+    };
+
+    function tick() {
+        canvasElement.height = video.videoHeight;
+        canvasElement.width = video.videoWidth;
+        canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+
+        scanning && requestAnimationFrame(tick);
+    }
+
+    function scan() {
+        try {
+            qrcode.decode();
+        } catch (e) {
+            setTimeout(scan, 300);
+        }
+    }
 </script>
