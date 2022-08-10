@@ -47,5 +47,5 @@ app.use('/', require('./routes/routes.js'))
 app.use('/', require('./routes/auth.js'))
 
 app.listen(port, server_host, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+  console.log(`Server running at http://${hostname}:${server_host}:${port}/`);
 });
