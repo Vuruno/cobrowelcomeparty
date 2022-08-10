@@ -79,12 +79,12 @@ router.post('/nuevoPago', jsonParser, async function (req, res) {
     pago.Cobrador = req.user.username
 
     var pagados = require('../pagados.json')
-    let add = true
+    let add = false
 
     var aux = await Pagado.findOne({ CIP: pago.CIP })
     console.log(aux)
     if (aux == null)
-        add = false
+        add = true
 
     if (add) {
         const savePago = new Pagado(pago)
