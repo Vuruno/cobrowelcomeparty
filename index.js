@@ -1,0 +1,48 @@
+const http = require('http');
+const express = require('express');
+const router = express.Router();
+const app = express()
+const path = require('path')
+const expressLayouts = require('express-ejs-layouts');
+const bodyparser = require('body-parser');
+
+var logger = require('morgan');
+var passport = require('passport');
+var session = require('express-session');
+const cookieParser = require('cookie-parser');
+
+// app.use(bodyparser.json({ limit: '50mb' }));
+// app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }));
+
+// middlewares
+app.use(bodyparser.urlencoded({
+  extended: true
+}));
+app.use(express.urlencoded({extended: true})); 
+app.set('views', path.join(__dirname, 'views'))
+app.use(express.static(path.join(__dirname, '/public')))
+
+app.use(cookieParser('eskere'))
+
+app.use(session({
+  secret: 'eskere',
+  resave: true,
+  saveUninitialized: true,
+}));
+app.use(passport.initialize())
+app.use(passport.session())
+
+const hostname = 'localhost';
+const port = 2380;
+
+app.use(expressLayouts);
+app.use(express.urlencoded({ extended: false }))
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'ejs')
+
+app.use('/', require('./routes/routes.js'))
+app.use('/', require('./routes/auth.js'))
+
+app.listen(port, hostname, () => {
+  console.log(`Server running at http://${hostname}:${port}/`);
+});
