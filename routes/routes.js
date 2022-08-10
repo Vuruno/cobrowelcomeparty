@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { isntLoggedIn, isLoggedIn } = require('../settings/isAuth')
+const Pagado = require('../models/Pagado')
 
 // const multer = require("multer");
 // const upload = multer();
@@ -74,25 +75,26 @@ router.post('/nuevoPago', jsonParser, async function (req, res) {
     const pago = req.body
     pago.CIP = Number(pago.CIP)
     pago.Entradas = Number(pago.Entradas)
-    pago.fecha = new Date()
-    pago.cobrador = req.user.username
+    pago.Fecha = new Date()
+    pago.Cobrador = req.user.username
 
     var pagados = require('../pagados.json')
     let add = true
 
-    for (x of pagados) {
-        if (x.CIP == pago.CIP)
-            add = false
-    }
+    var aux = await Pagado.findOne({ CIP: pago.CIP })
+    console.log(aux)
+    if (aux == null)
+        add = false
 
     if (add) {
-        pagados.push(pago)
-        fs.writeFileSync('pagados.json', JSON.stringify(pagados))
+        const savePago = new Pagado(pago)
+        await savePago.save()
+        // pagados.push(pago)
+        // fs.writeFileSync('pagados.json', JSON.stringify(pagados))
         res.redirect(`/lista/agregado=${pago.Nombre}`)
     } else {
         res.redirect(`/lista/error=${pago.Nombre}`)
     }
-
 })
 
 module.exports = router;

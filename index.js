@@ -5,6 +5,7 @@ const app = express()
 const path = require('path')
 const expressLayouts = require('express-ejs-layouts');
 const bodyparser = require('body-parser');
+const mongoose = require('mongoose');
 
 var logger = require('morgan');
 var passport = require('passport');
@@ -13,6 +14,15 @@ const cookieParser = require('cookie-parser');
 
 require('dotenv').config()
 
+// Connect to MongoDB
+mongoose.connect(
+  process.env.DB_URL,
+  { useNewUrlParser: true, useUnifiedTopology: true }
+)
+  .then(() => console.log('MongoDB Connected'))
+  .catch(err => console.log(err));
+app.use(express.json({ limit: '1mb' }))
+
 // app.use(bodyparser.json({ limit: '50mb' }));
 // app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }));
 
@@ -20,7 +30,7 @@ require('dotenv').config()
 app.use(bodyparser.urlencoded({
   extended: true
 }));
-app.use(express.urlencoded({extended: true})); 
+app.use(express.urlencoded({ extended: true }));
 app.set('views', path.join(__dirname, 'views'))
 app.use(express.static(path.join(__dirname, '/public')))
 
