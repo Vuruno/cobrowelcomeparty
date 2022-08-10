@@ -8,7 +8,7 @@ const bodyparser = require('body-parser');
 
 var logger = require('morgan');
 var passport = require('passport');
-var session = require('express-session');
+var session = require('cookie-session');
 const cookieParser = require('cookie-parser');
 
 // app.use(bodyparser.json({ limit: '50mb' }));
