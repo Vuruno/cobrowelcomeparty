@@ -11,6 +11,8 @@ var passport = require('passport');
 var session = require('cookie-session');
 const cookieParser = require('cookie-parser');
 
+require('dotenv').config()
+
 // app.use(bodyparser.json({ limit: '50mb' }));
 // app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }));
 
@@ -33,7 +35,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 const hostname = 'localhost';
-const port = 2380;
+const port = process.env.PORT;
 
 app.use(expressLayouts);
 app.use(express.urlencoded({ extended: false }))
