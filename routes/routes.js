@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { isntLoggedIn } = require('../settings/isAuth')
+const { isntLoggedIn, isLoggedIn } = require('../settings/isAuth')
 
 // const multer = require("multer");
 // const upload = multer();
@@ -40,11 +40,11 @@ router.get('/', async function (req, res) {
     res.render('index')
 })
 
-router.get('/cobrar', async function (req, res) {
+router.get('/cobrar', isLoggedIn, async function (req, res) {
     res.redirect('/cobrar/manual')
 })
 
-router.get('/cobrar/:id', async function (req, res) {
+router.get('/cobrar/:id', isLoggedIn, async function (req, res) {
     let qr = req.params.id == 'qr' ? 'qr' : 'false'
     res.render('cobro', { qr: qr })
 })
@@ -58,7 +58,7 @@ router.get('/lista/:status', async function (req, res) {
     res.render('lista', { status: status[0], nombre: status[1] })
 })
 
-router.post('/uploadqr', jsonParser, async function (req, res) {
+router.post('/uploadqr', isLoggedIn, jsonParser, async function (req, res) {
     var cip = req.body.CIP;
     cip = Number(cip)
 
@@ -74,7 +74,8 @@ router.post('/nuevoPago', jsonParser, async function (req, res) {
     const pago = req.body
     pago.CIP = Number(pago.CIP)
     pago.Entradas = Number(pago.Entradas)
-    pago['fecha'] = new Date()
+    pago.fecha = new Date()
+    pago.cobrador = req.user.username
 
     var pagados = require('../pagados.json')
     let add = true

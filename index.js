@@ -34,7 +34,7 @@ app.use(session({
 app.use(passport.initialize())
 app.use(passport.session())
 
-const hostname = 'localhost';
+const hostname = '127.0.0.1';
 const port = process.env.PORT;
 const server_host = '0.0.0.0';
 
@@ -47,5 +47,5 @@ app.use('/', require('./routes/routes.js'))
 app.use('/', require('./routes/auth.js'))
 
 app.listen(port, server_host, hostname, () => {
-  console.log(`Server running at http://${hostname}:${server_host}:${port}/`);
+  console.log(`Server running at http://${hostname}:${port}/`);
 });
