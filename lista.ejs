@@ -1,0 +1,23 @@
+<% if(status=='error' ) {%>
+    <div class="alert alert-dismissible alert-danger">
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <strong>
+            <%= nombre %>
+        </strong> ya se encuentra registrado/a.
+    </div>
+    <% } else if(status=='agregado' ) { %>
+        <div class="alert alert-dismissible alert-success">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            Se ha registrado a <strong>
+                <%= nombre %>
+            </strong>.
+        </div>
+        <% } %>
+
+            <script>
+                fetch("./pagados.json")
+                    .then(data => {
+                        console.log(data[0]);
+                    })
+                    .catch(console.error);
+            </script>

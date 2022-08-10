@@ -1,0 +1,166 @@
+<style>
+    #qr-canvas {
+        width: 100%;
+        background-color: #aaa;
+    }
+</style>
+
+<form action="/nuevoPago" method="post" id="form-student" hidden>
+    <div class="form-group">
+        <label for="nombre" class="form-label mt-4"> CIP </label>
+        <input type="number" class="form-control" id="CIP" name="CIP" required>
+    </div>
+    <div class="form-group">
+        <label for="nombre" class="form-label mt-4"> Nombre Completo </label>
+        <input type="text" class="form-control" id="Nombre" name="Nombre" required>
+    </div>
+    <div class="form-group">
+        <label for="nombre" class="form-label mt-4"> Cohorte </label>
+        <input type="number" class="form-control" id="Cohorte" name="Cohorte">
+    </div>
+    <div class="form-group">
+        <label for="nombre" class="form-label mt-4"> Carrera </label>
+        <select class="form-select" id="Carrera" name="Carrera">
+            <option>INFORMATION ENG.</option>
+            <option>CIVIL ENG.</option>
+            <option>INDUSTRIAL ENG.</option>
+            <option>ELECTROMECHANICAL ENG.</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="nombre" class="form-label mt-4"> Cantidad de Entradas </label>
+        <input type="number" class="form-control" id="Entradas" name="Entradas" required value="1">
+    </div>
+    <button type="submit" class="btn btn-primary mt-3 mb-5"> Guardar </button>
+</form>
+
+<div class="bs-component">
+    <div class="d-grid">
+        <a class="btn btn-lg btn-primary my-3" href="/cobrar" id="cobrarManual">
+            <span class="material-symbols-outlined">
+                note_alt
+            </span>Cobrar manualmente
+        </a>
+        <a class="btn btn-lg btn-primary my-3" href="/cobrar/qr" id="cobrarQR">
+            <span class="material-symbols-outlined">
+                qr_code_scanner
+            </span> Cobrar con QR
+        </a>
+    </div>
+</div>
+
+<canvas id="qr-canvas" hidden></canvas>
+
+<div id="form-cedula" hidden>
+    <div class="form-group">
+        <label for="nombre" class="form-label mt-4"> Cédula </label>
+        <input type="number" class="form-control" id="CIPbucar" required>
+        <button onclick="getStudentInfo(this.previousElementSibling.value)" id="btnBuscarCip"
+            class="btn btn-primary mt-3 mb-5" disabled>
+            Buscar
+        </button>
+    </div>
+</div>
+
+
+<script src="https://rawgit.com/sitepoint-editors/jsqrcode/master/src/qr_packed.js"></script>
+<script>
+    const video = document.createElement("video");
+    const canvasElement = document.getElementById("qr-canvas");
+    const canvas = canvasElement.getContext("2d");
+
+    // const qrResult = document.getElementById("qr-result");
+    const outputData = document.getElementById("outputData");
+    const btnScanQR = document.getElementById("btn-scan-qr");
+    const form = document.getElementById('form-student')
+    const formCedula = document.getElementById('form-cedula')
+    const btnManual = document.getElementById("cobrarManual")
+    const btnQR = document.getElementById("cobrarQR")
+
+    if (window.location.pathname.split('/')[2] == 'qr') {
+        start()
+        cobrarQR.hidden = true
+    } else {
+        scanning = false
+        cobrarManual.hidden = true
+        formCedula.hidden = false
+    }
+
+    CIPbucar.onmouseover = function () {
+        document.getElementById('btnBuscarCip').disabled = false
+    }
+
+
+    qrcode.callback = (res) => {
+        if (res) {
+            res = res.slice(4).split('.').join("")
+
+            getStudentInfo(res);
+
+            scanning = false;
+            canvasElement.hidden = true
+
+            video.srcObject.getTracks().forEach(track => {
+                track.stop();
+            });
+        }
+    };
+
+    function getStudentInfo(res) {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ CIP: res })
+        };
+        fetch('/uploadqr', requestOptions)
+            .then(res => res.json())
+            .then(data => {
+                formCedula.hidden = true
+                form.hidden = false
+
+                btnManual.hidden = false
+                btnQR.hidden = false
+
+                document.getElementById('CIP').value = data.CIP
+                document.getElementById('Nombre').value = data["COMPLETE NAME"]
+                document.getElementById('Cohorte').value = data.COHORT
+                document.getElementById('Carrera').value = data.MAJOR
+                if (!data) {
+                    alert('NO SE ENCONTRARON COINCIDENCIAS')
+                }
+            }).catch(err => {
+                console.error('Error: ', err);
+            });
+    }
+
+    function start() {
+        canvasElement.hidden = false;
+        navigator.mediaDevices
+            .getUserMedia({ video: { facingMode: "environment" } })
+            .then(function (stream) {
+                scanning = true;
+                // btnScanQR.hidden = true;
+                video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
+                video.srcObject = stream;
+                video.play();
+                tick();
+                scan();
+            });
+    }
+
+    function tick() {
+        canvasElement.height = video.videoHeight;
+        canvasElement.width = video.videoWidth;
+        canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+
+        scanning && requestAnimationFrame(tick);
+    }
+
+    function scan() {
+        try {
+            qrcode.decode();
+        } catch (e) {
+            setTimeout(scan, 300);
+        }
+    }
+</script>

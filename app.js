@@ -6,6 +6,11 @@ const path = require('path')
 const expressLayouts = require('express-ejs-layouts');
 const bodyparser = require('body-parser');
 
+var logger = require('morgan');
+var passport = require('passport');
+var session = require('express-session');
+const cookieParser = require('cookie-parser');
+
 // app.use(bodyparser.json({ limit: '50mb' }));
 // app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }));
 
@@ -15,9 +20,19 @@ app.use(bodyparser.urlencoded({
 }));
 app.use(express.urlencoded({extended: true})); 
 // app.use(express.json());
-app.use(express.static(path.resolve('./public')));
+app.use(express.static(path.resolve('./src')));
 
-const hostname = '127.0.0.1';
+app.use(cookieParser('eskere'))
+
+app.use(session({
+  secret: 'eskere',
+  resave: true,
+  saveUninitialized: true,
+}));
+app.use(passport.initialize())
+app.use(passport.session())
+
+const hostname = 'localhost';
 const port = 2380;
 
 app.use(expressLayouts);
@@ -26,7 +41,8 @@ app.set('views', path.join(__dirname))
 app.set('view engine', 'ejs')
 
 app.use('/', require('./routes.js'))
+app.use('/', require('./auth.js'))
 
-app.listen(port, "0.0.0.0", hostname, () => {
+app.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 });
