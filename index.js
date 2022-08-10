@@ -36,6 +36,7 @@ app.use(passport.session())
 
 const hostname = 'localhost';
 const port = process.env.PORT;
+const server_host = '0.0.0.0';
 
 app.use(expressLayouts);
 app.use(express.urlencoded({ extended: false }))
@@ -45,6 +46,6 @@ app.set('view engine', 'ejs')
 app.use('/', require('./routes/routes.js'))
 app.use('/', require('./routes/auth.js'))
 
-app.listen(port, hostname, () => {
+app.listen(port, server_host, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 });
