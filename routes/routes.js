@@ -60,11 +60,13 @@ router.get('/lista', async function (req, res) {
 })
 
 router.get('/lista/:status', async function (req, res) {
-
-
-
     let status = req.params.status.split("=")
     res.render('lista', { status: status[0], nombre: status[1] })
+})
+
+router.get('/getPagados', async function (req, res) {
+    let pagados = await Pagado.find()
+    res.end(JSON.stringify(pagados))
 })
 
 router.post('/uploadqr', isLoggedIn, jsonParser, async function (req, res) {
@@ -72,10 +74,14 @@ router.post('/uploadqr', isLoggedIn, jsonParser, async function (req, res) {
     cip = Number(cip)
 
     const student = getOneStudent(cip)
-    if (student)
-        console.log(student['COMPLETE NAME'])
 
     res.end(JSON.stringify(student))
+})
+
+router.get('/delete/:cip', isLoggedIn, async function (req, res) {
+    let cip = req.params.cip
+    await Pagado.findOneAndDelete({CIP: cip})
+    res.redirect('/lista')
 })
 
 router.post('/nuevoPago', jsonParser, async function (req, res) {
@@ -83,14 +89,15 @@ router.post('/nuevoPago', jsonParser, async function (req, res) {
     const pago = req.body
     pago.CIP = Number(pago.CIP)
     pago.Entradas = Number(pago.Entradas)
-    pago.Fecha = new Date()
+    pago.Fecha = String(new Date())
     pago.Cobrador = req.user.username
+
 
     var pagados = require('../pagados.json')
     let add = false
 
     var aux = await Pagado.findOne({ CIP: pago.CIP })
-    console.log(aux)
+
     if (aux == null)
         add = true
 

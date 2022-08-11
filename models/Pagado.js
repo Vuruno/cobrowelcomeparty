@@ -6,6 +6,7 @@ const PagadoSchema = new mongoose.Schema({
     Cohorte: String,
     Carrera: String,
     Entradas: Number,
+    Fecha: { type: Date, default: new Date() },
     Cobrador: String
 });
 
