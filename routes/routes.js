@@ -11,7 +11,7 @@ var jsonParser = bodyParser.json();
 const studentsdb = require('../students.json')
 
 function getOneStudent(cip) {
-    if (cip < studentsdb[0].CIP || cip < studentsdb[studentsdb.length - 1].CIP)
+    if (cip < studentsdb[0].CIP || cip > studentsdb[studentsdb.length - 1].CIP)
         return null
 
     var a = 0
