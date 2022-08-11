@@ -11,23 +11,28 @@ var jsonParser = bodyParser.json();
 const studentsdb = require('../students.json')
 
 function getOneStudent(cip) {
+    if (cip < studentsdb[0].CIP || cip < studentsdb[studentsdb.length - 1].CIP)
+        return null
 
     var a = 0
     var b = studentsdb.length - 1
     var x, xCip
-    do {
+
+    while (a != b) {
         x = parseInt((a + b) / 2)
         xCip = studentsdb[x].CIP
-        if (xCip < cip) {
-            a = x;
-        } else if (xCip > cip) {
-            b = x;
-        }
-    } while (xCip != cip && a != b)
 
-    if (xCip != cip)
-        return null
-    return studentsdb[x]
+        if (xCip == cip)
+            return studentsdb[x]
+
+        else if (cip > xCip)
+            a = x + 1
+
+        else
+            b = x - 1
+    }
+
+    return null
 }
 
 const fs = require('fs')
@@ -55,6 +60,9 @@ router.get('/lista', async function (req, res) {
 })
 
 router.get('/lista/:status', async function (req, res) {
+
+
+
     let status = req.params.status.split("=")
     res.render('lista', { status: status[0], nombre: status[1] })
 })
