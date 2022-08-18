@@ -11,23 +11,24 @@ fetch('/getPagados')
             text += `<td>${x.Carrera}</td>`
             text += `<td>${x.Cobrador}</td>`
             text += `<td>${x.Fecha}</td>`
-            // text += `<td> <a class="confirmation btn btn-sm btn-primary align-center" href="#"
-            //             onclick="deletePago(this)"> <span class="material-symbols-outlined">
-            //             delete
-            //             </span> </a> </td>`
-            // href="/delete/${x.CIP}"
+            text += `<td> <a class="confirmation btn btn-sm btn-primary align-center" href="/delete/${x.CIP}">
+                        <span class="material-symbols-outlined">
+                            delete
+                        </span> </a> </td>`
             text += '</tr>'
         }
 
-        var elems = document.getElementsByClassName('confirmation');
+        
+
+        table.innerHTML = text
 
         var confirmIt = function (e) {
-            if (!confirm('Are you sure?')) e.preventDefault();
+            if (!confirm('Eliminar permanentemente?')) e.preventDefault();
             else that.innerHTML = '<div class="spinner-border spinner-border-sm text-light" role="status"><span class="visually-hidden">Loading...</span></div>'
         };
+
+        var elems = document.getElementsByClassName('confirmation');
         for (var i = 0, l = elems.length; i < l; i++) {
             elems[i].addEventListener('click', confirmIt, false);
         }
-
-        table.innerHTML = text
     })
